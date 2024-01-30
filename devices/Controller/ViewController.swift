@@ -86,30 +86,25 @@ final class ViewController: UIViewController {
                             print("Используем файл из бандла")
                             self?.showData(isBundleToParse: true)
                         }
-                        self?.tableView.reloadData()
-                        // показываем информацию о конкретном девайсе
-                        self?.deviceModel = FileStore.shared.getDeviceDescription(
-                            key: FileStore.shared.getModelName()) ?? "not device"
-                        print(self?.deviceModel ?? "not device")
+                        self?.showDevices()
                     }
                 }
             } else {
                 print("Файл в документах новый - скачивать не нужно")
                 showData(isBundleToParse: false)
-                tableView.reloadData()
-                // показываем информацию о конкретном девайсе
-                deviceModel = FileStore.shared.getDeviceDescription(key:
-                FileStore.shared.getModelName()) ?? "not device"
-                print(deviceModel)
+                showDevices()
             }
         } else {
             print("Используем файл в бандле")
             showData(isBundleToParse: true)
-            tableView.reloadData()
-            // показываем информацию о конкретном девайсе
-            deviceModel = FileStore.shared.getDeviceDescription(key: FileStore.shared.getModelName()) ?? "not device"
-            print(deviceModel)
+            showDevices()
         }
+    }
+    private func showDevices() {
+        tableView.reloadData()
+        // показываем информацию о конкретном девайсе
+        deviceModel = FileStore.shared.getDeviceDescription(key: FileStore.shared.getModelName()) ?? "not device"
+        print(deviceModel)
     }
 }
 
