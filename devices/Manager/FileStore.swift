@@ -8,6 +8,7 @@
 import UIKit
 
 public final class FileStore {
+    
     // MARK: - Properties
     /// время жизни файла в секундах
     public let secondsOfFilesLife = 30
@@ -15,6 +16,7 @@ public final class FileStore {
     public var devicesInfo: [String: String] = [:]
     public static let shared: FileStore = .init()
     private init() {}
+    
     // MARK: - Private
     private func parsingFile(fileURL: URL, encoding: String.Encoding) {
         if FileManager.default.fileExists(atPath: fileURL.path) {
@@ -36,6 +38,7 @@ public final class FileStore {
             print("Файл '\(fileName)' не найден в директории Documents.")
         }
     }
+    
     // MARK: - Internal
     // возвращает путь до бандла
     internal func findPathToFileInBundle() -> URL? {
@@ -46,6 +49,7 @@ public final class FileStore {
         let fileURL = URL(fileURLWithPath: bundlePath)
         return fileURL
     }
+    
     // возвращает путь до папки документ
     internal func findPathToFileInDocument() -> URL? {
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -54,19 +58,23 @@ public final class FileStore {
         }
         return nil
     }
+    
     // парсим файл в директории Document
     internal func parsingFileInDocument(fileURL: URL) {
         parsingFile(fileURL: fileURL, encoding: .utf8)
     }
+    
     // парсим файл в бандле
     internal func parsingFileInBundle(fileURL: URL) {
         parsingFile(fileURL: fileURL, encoding: .isoLatin1)
     }
+    
     // MARK: - Public
     // по ключу отдаем значение девайса
     public func getDeviceDescription(key: String) -> String? {
         return devicesInfo[key]
     }
+    
     // получаем данные о модели
     public func getModelName() -> String {
         var machineString = String()
@@ -79,6 +87,7 @@ public final class FileStore {
         }
         return machineString
     }
+    
     // проверяем время жизни файла(ов)
     public func checkCreateDate(seconds: TimeInterval, fileURL: URL) -> Bool {
         do {

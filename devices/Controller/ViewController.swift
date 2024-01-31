@@ -8,6 +8,7 @@
 import UIKit
 
 final class ViewController: UIViewController {
+    
     // MARK: - UI
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -16,6 +17,7 @@ final class ViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
+    
     // MARK: - Data
     private var tableData: [DeviceData] = []
     private var isBadBundleFile: Bool {
@@ -33,12 +35,14 @@ final class ViewController: UIViewController {
         return true
     }
     private var deviceModel = ""
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         constraints()
         updateData()
     }
+    
     // MARK: - Private
     private func constraints() {
         view.addSubview(tableView)
@@ -49,6 +53,7 @@ final class ViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
+    
     // парсим один из файлов
     private func showData(isBundleToParse: Bool) {
         // если время жизни документа в бандле не было просрочено - парсим файл в бандле
@@ -66,6 +71,7 @@ final class ViewController: UIViewController {
         tableData = FileStore.shared.devicesInfo.map { DeviceData(key: $0.key, value: $0.value)}
         tableData = tableData.sorted { $0.key > $1.key }
     }
+    
     // отображаем данные о девайсах
     private func updateData() {
         /// если время жизни документа в бандле было просрочено или иные причины
@@ -100,6 +106,7 @@ final class ViewController: UIViewController {
             showDevices()
         }
     }
+    
     private func showDevices() {
         tableView.reloadData()
         // показываем информацию о конкретном девайсе
@@ -109,9 +116,11 @@ final class ViewController: UIViewController {
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableData.count
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
         cell.textLabel?.text = tableData[indexPath.row].value
