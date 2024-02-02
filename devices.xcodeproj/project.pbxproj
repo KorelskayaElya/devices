@@ -9,8 +9,9 @@
 /* Begin PBXBuildFile section */
 		16453C8D524DBD3C0A555AA9 /* Pods_devices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B5E1A83E1FFCF5448E8E91F /* Pods_devices.framework */; };
 		6D2F31752B67C25300A39C70 /* DeviceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2F31742B67C25300A39C70 /* DeviceData.swift */; };
-		6D2F31772B67C32300A39C70 /* Apple_mobile_device_types.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6D2F31762B67C32300A39C70 /* Apple_mobile_device_types.txt */; };
 		6D2F317A2B693C3600A39C70 /* DownloadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2F31792B693C3600A39C70 /* DownloadError.swift */; };
+		6D2F317C2B6D147400A39C70 /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2F317B2B6D147400A39C70 /* DeviceManager.swift */; };
+		6D2F317E2B6D177F00A39C70 /* DevicesFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2F317D2B6D177F00A39C70 /* DevicesFile.swift */; };
 		6D6406BE2B64077D0086E3F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6406BD2B64077D0086E3F7 /* AppDelegate.swift */; };
 		6D6406C02B64077D0086E3F7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6406BF2B64077D0086E3F7 /* SceneDelegate.swift */; };
 		6D6406C22B64077D0086E3F7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6406C12B64077D0086E3F7 /* ViewController.swift */; };
@@ -23,8 +24,9 @@
 /* Begin PBXFileReference section */
 		5EC0FC76C7D348147EB08942 /* Pods-devices.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-devices.release.xcconfig"; path = "Target Support Files/Pods-devices/Pods-devices.release.xcconfig"; sourceTree = "<group>"; };
 		6D2F31742B67C25300A39C70 /* DeviceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceData.swift; sourceTree = "<group>"; };
-		6D2F31762B67C32300A39C70 /* Apple_mobile_device_types.txt */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = text; path = Apple_mobile_device_types.txt; sourceTree = "<group>"; };
 		6D2F31792B693C3600A39C70 /* DownloadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadError.swift; sourceTree = "<group>"; };
+		6D2F317B2B6D147400A39C70 /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
+		6D2F317D2B6D177F00A39C70 /* DevicesFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesFile.swift; sourceTree = "<group>"; };
 		6D6406BA2B64077D0086E3F7 /* devices.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = devices.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D6406BD2B64077D0086E3F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6D6406BF2B64077D0086E3F7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -64,16 +66,9 @@
 			children = (
 				6D2F31742B67C25300A39C70 /* DeviceData.swift */,
 				6D2F31792B693C3600A39C70 /* DownloadError.swift */,
+				6D2F317D2B6D177F00A39C70 /* DevicesFile.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		6D2F31782B67C32C00A39C70 /* Resourses */ = {
-			isa = PBXGroup;
-			children = (
-				6D2F31762B67C32300A39C70 /* Apple_mobile_device_types.txt */,
-			);
-			path = Resourses;
 			sourceTree = "<group>";
 		};
 		6D6406B12B64077D0086E3F7 = {
@@ -103,7 +98,6 @@
 				6D6406BD2B64077D0086E3F7 /* AppDelegate.swift */,
 				6D6406BF2B64077D0086E3F7 /* SceneDelegate.swift */,
 				6D6406CB2B64077F0086E3F7 /* Info.plist */,
-				6D2F31782B67C32C00A39C70 /* Resourses */,
 				6D6406D82B652D680086E3F7 /* Other */,
 			);
 			path = devices;
@@ -122,6 +116,7 @@
 			children = (
 				6D6406D32B65241B0086E3F7 /* FileStore.swift */,
 				6D6406D12B651D830086E3F7 /* NetworkManager.swift */,
+				6D2F317B2B6D147400A39C70 /* DeviceManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -205,7 +200,6 @@
 			files = (
 				6D6406CA2B64077F0086E3F7 /* LaunchScreen.storyboard in Resources */,
 				6D6406C72B64077F0086E3F7 /* Assets.xcassets in Resources */,
-				6D2F31772B67C32300A39C70 /* Apple_mobile_device_types.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,11 +254,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D6406D42B65241B0086E3F7 /* FileStore.swift in Sources */,
+				6D2F317C2B6D147400A39C70 /* DeviceManager.swift in Sources */,
 				6D6406D22B651D830086E3F7 /* NetworkManager.swift in Sources */,
 				6D6406C22B64077D0086E3F7 /* ViewController.swift in Sources */,
 				6D6406BE2B64077D0086E3F7 /* AppDelegate.swift in Sources */,
 				6D6406C02B64077D0086E3F7 /* SceneDelegate.swift in Sources */,
 				6D2F317A2B693C3600A39C70 /* DownloadError.swift in Sources */,
+				6D2F317E2B6D177F00A39C70 /* DevicesFile.swift in Sources */,
 				6D2F31752B67C25300A39C70 /* DeviceData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

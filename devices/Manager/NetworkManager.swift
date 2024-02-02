@@ -8,23 +8,32 @@
 import UIKit
 
 final class NetworkManager {
-    
+
     // MARK: - Properties
-    private let fileURL = URL(string: "https://gist.githubusercontent.com/" +
-                              "adamawolf/3048717/" +
-                              "raw/07ad6645b25205ef2072a560e660c636c8330626"
-                              + "/Apple_mobile_device_types.txt")!
-    
+
+    private let fileURL: URL? = {
+        guard let url = URL(string: """
+            https://gist.githubusercontent.com/
+            adamawolf/3048717/
+            raw/07ad6645b25205ef2072a560e660c636c8330626/Apple_mobile_device_types.txt
+        """) else {
+            return nil
+        }
+        return url
+    }()
+
+
     // MARK: - Function
+
     public func downloadFile(completion: @escaping (Result<Void, Error>) -> Void) {
-        let task = URLSession.shared.downloadTask(with: fileURL) { file, _, error in
+        let task = URLSession.shared.downloadTask(with: (fileURL ?? URL(string: "https://example.com/default")!)) { file, _, error in
             if let file = file, error == nil {
-                guard let destinationURL =
-                FileManager.default.urls(for: .documentDirectory,
-                in: .userDomainMask).first?.appendingPathComponent(
-                    self.fileURL.lastPathComponent) else {
-                    completion(.failure(DownloadError.invalidDestinationURL))
-                    return
+                guard let destinationURL = FileManager.default
+                    .urls(for: .documentDirectory, in: .userDomainMask)
+                    .first?
+                    .appendingPathComponent(self.fileURL?.lastPathComponent ?? "") else {
+                        completion(.failure(DownloadError.invalidDestinationURL))
+                        return
                 }
                 do {
                     if FileManager.default.fileExists(atPath: destinationURL.path) {
@@ -39,8 +48,11 @@ final class NetworkManager {
                     completion(.failure(error))
                 }
             } else {
-                let downloadError = NSError(domain: "DownloadErrorDomain",
-                code: 0, userInfo: [NSLocalizedDescriptionKey: error?.localizedDescription ?? "Неизвестная ошибка"])
+                let downloadError = NSError(
+                    domain: "DownloadErrorDomain",
+                    code: 0,
+                    userInfo: [NSLocalizedDescriptionKey: error?.localizedDescription ?? "Неизвестная ошибка"]
+                )
                 print("Ошибка скачивания файла в документы: \(downloadError.localizedDescription)")
                 completion(.failure(downloadError))
             }
