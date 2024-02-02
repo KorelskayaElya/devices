@@ -14,6 +14,7 @@ public final class FileStore {
     /// время жизни файла в секундах
     public let secondsOfFilesLife = 30
     private let fileName = "Apple_mobile_device_types.txt"
+    public var devicesInfo: [String: String] = [:]
     public static let shared: FileStore = .init()
     private init() {}
 

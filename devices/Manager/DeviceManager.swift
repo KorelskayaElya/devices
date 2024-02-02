@@ -11,7 +11,6 @@ final class DeviceManager {
 
     // MARK: - Properties
 
-    public var devicesInfo: [String: String] = [:]
     private let fileName = "Apple_mobile_device_types.txt"
 
     // MARK: - Private
@@ -26,7 +25,7 @@ final class DeviceManager {
                     if components.count == 2 {
                         let key = components[0].trimmingCharacters(in: .whitespaces)
                         let value = components[1].trimmingCharacters(in: .whitespaces)
-                        devicesInfo[key] = value
+                        FileStore.shared.devicesInfo[key] = value
                     }
                 }
             } catch {
@@ -44,31 +43,42 @@ final class DeviceManager {
         parsingFile(fileURL: fileURL, encoding: .utf8)
     }
 
-    // парсим файл в бандле
+    // парсим файл в бандле - не используется
     internal func parsingFileInBundle(fileURL: URL) {
         parsingFile(fileURL: fileURL, encoding: .isoLatin1)
     }
 
+    // парсим файл девайсов
+    internal func parsingFileInDeviceFile(file: String) {
+        let lines = devicesFile.components(separatedBy: "\n")
+        for line in lines {
+            let components = line.components(separatedBy: ":")
+            if components.count == 2 {
+                let key = components[0].trimmingCharacters(in: .whitespaces)
+                let value = components[1].trimmingCharacters(in: .whitespaces)
+                FileStore.shared.devicesInfo[key] = value
+            }
+        }
+    }
+
     // по ключу отдаем значение девайса
     internal func getDeviceDescription(key: String) -> String? {
-        return devicesInfo[key]
+        return FileStore.shared.devicesInfo[key]
     }
 
     // парсим один из файлов
     internal func showDevicesInfo(isDevicesFileToParse: Bool) -> [DeviceData] {
-        // если время жизни документа в бандле не было просрочено - парсим файл в бандле
+        // если была ошибка сети - парсим файл девайсов
         if isDevicesFileToParse {
-            if let bundleFileURL = FileStore.shared.findPathToFileInBundle() {
-                DeviceManager().parsingFileInBundle(fileURL: bundleFileURL)
-            }
+            parsingFileInDeviceFile(file: devicesFile)
         } else {
             if let documentFileURL = FileStore.shared.findPathToFileInDocument() {
                 // иначе парсим документ
-                DeviceManager().parsingFileInDocument(fileURL: documentFileURL)
+                parsingFileInDocument(fileURL: documentFileURL)
             }
         }
         // в любом случае показываем информацию о девайсах
-        return devicesInfo
+        return FileStore.shared.devicesInfo
             .map { DeviceData(key: $0.key, value: $0.value) }
             .sorted { $0.key > $1.key }
     }
@@ -82,7 +92,6 @@ final class DeviceManager {
 extension DeviceManager {
 
     // MARK: - Internal
-
     // получаем данные о модели
     internal func getModelName() -> String {
         var machineString = String()

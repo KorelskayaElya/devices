@@ -67,15 +67,16 @@ final class ViewController: UIViewController {
                         print("Используем файл из devicesFile")
                         self?.tableData = DeviceManager().showDevicesInfo(isDevicesFileToParse: true)
                     }
+                    self?.tableView.reloadData()
                     self?.deviceModel = DeviceManager().showUsingDevice()
                 }
             }
         } else {
             print("Файл в документах новый - скачивать не нужно")
             tableData = DeviceManager().showDevicesInfo(isDevicesFileToParse: false)
+            tableView.reloadData()
             deviceModel = DeviceManager().showUsingDevice()
         }
-        tableView.reloadData()
     }
 }
 
