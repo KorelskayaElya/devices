@@ -20,16 +20,6 @@ public final class FileStore {
 
     // MARK: - Internal
 
-    // возвращает путь до бандла
-    internal func findPathToFileInBundle() -> URL? {
-        guard let bundlePath = Bundle.main.path(forResource: fileName, ofType: nil) else {
-            print("Файл не найден в бандле")
-            return nil
-        }
-        let fileURL = URL(fileURLWithPath: bundlePath)
-        return fileURL
-    }
-
     // возвращает путь до папки документ
     internal func findPathToFileInDocument() -> URL? {
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -46,17 +36,11 @@ public final class FileStore {
             if let creationDate = attributes[.creationDate] as? Date {
                 let currentTime = Date()
                 let timeDifference = currentTime.timeIntervalSince(creationDate)
-                if timeDifference > seconds {
-                    print("checkCreateDate: Файл старый - Время в секундах с момента создания файла \(timeDifference)")
-                    return true
-                } else {
-                    print("checkCreateDate: Файл новый")
-                    return false
-                }
+                print("checkCreateDate: Время в секундах с момента создания файла \(timeDifference)")
+                return timeDifference > seconds
             }
         } catch {
             print("checkCreateDate: Ошибка при получении атрибутов: \(error.localizedDescription)")
-            return true
         }
         return true
     }

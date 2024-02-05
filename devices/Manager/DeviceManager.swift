@@ -16,7 +16,7 @@ final class DeviceManager {
     // MARK: - Private
 
     private func parsingFile(fileURL: URL, encoding: String.Encoding) {
-        if FileManager.default.fileExists(atPath: fileURL.path) {
+        if existingFile(fileURL: fileURL) {
             do {
                 let fileContent = try String(contentsOf: fileURL, encoding: encoding)
                 let lines = fileContent.components(separatedBy: "\n")
@@ -28,7 +28,7 @@ final class DeviceManager {
                         FileStore.shared.devicesInfo[key] = value
                     }
                 }
-            } catch {
+            } catch let error {
                 print("Ошибка при чтении файла: \(error.localizedDescription)")
             }
         } else {
@@ -38,14 +38,29 @@ final class DeviceManager {
 
     // MARK: - Internal
 
+    // проверяем есть ли файл
+    internal func existingFile(fileURL: URL) -> Bool {
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            return true
+        }
+        return false
+    }
+
+    // проверяем есть ли файл в документах
+    internal func existingFileInDocuments() -> Bool {
+        if let documentFileURL = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)
+            .first?
+            .appendingPathComponent(fileName),
+           FileManager.default.fileExists(atPath: documentFileURL.path) {
+            return true
+        }
+        return false
+    }
+
     // парсим файл в директории Document
     internal func parsingFileInDocument(fileURL: URL) {
         parsingFile(fileURL: fileURL, encoding: .utf8)
-    }
-
-    // парсим файл в бандле - не используется
-    internal func parsingFileInBundle(fileURL: URL) {
-        parsingFile(fileURL: fileURL, encoding: .isoLatin1)
     }
 
     // парсим файл девайсов

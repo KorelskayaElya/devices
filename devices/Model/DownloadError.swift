@@ -9,4 +9,5 @@ import UIKit
 
 enum DownloadError: Error {
     case invalidDestinationURL
+    case invalidURL
 }

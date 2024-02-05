@@ -31,6 +31,9 @@ final class ViewController: UIViewController {
         }
         return true
     }
+    private lazy var deviceManager: DeviceManager = {
+        return DeviceManager()
+    }()
 
     // MARK: - Lifecycle
 
@@ -54,28 +57,46 @@ final class ViewController: UIViewController {
 
     // отображаем данные о девайсах
     private func updateData() {
-        if isBadDocumentFile {
-            print("Файл в документах старый - нужно скачать новый")
+        let deviceManager = DeviceManager()
+        if deviceManager.existingFileInDocuments() {
+            tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: false)
+            tableView.reloadData()
+            if isBadDocumentFile {
+                NetworkManager().downloadFile { result in
+                    DispatchQueue.main.async { [weak self] in
+                        switch result {
+                        case .success:
+                            print("Файл в документах скачан успешно")
+                            self?.tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: false)
+                        case .failure(let error):
+                            print("Ошибка при скачивании файла: \(error.localizedDescription)")
+                            print("Используем девайсы из deviceInfo")
+                        }
+                        self?.tableView.reloadData()
+                        self?.deviceModel = deviceManager.showUsingDevice()
+                    }
+                }
+            } else {
+                tableView.reloadData()
+                deviceModel = deviceManager.showUsingDevice()
+            }
+        } else {
+            tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: true)
             NetworkManager().downloadFile { result in
                 DispatchQueue.main.async { [weak self] in
                     switch result {
                     case .success:
                         print("Файл в документах скачан успешно")
-                        self?.tableData = DeviceManager().showDevicesInfo(isDevicesFileToParse: false)
+                        self?.tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: false)
                     case .failure(let error):
                         print("Ошибка при скачивании файла: \(error.localizedDescription)")
-                        print("Используем файл из devicesFile")
-                        self?.tableData = DeviceManager().showDevicesInfo(isDevicesFileToParse: true)
+                        print("Используем девайсы из devicesFile")
+                        self?.tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: true)
                     }
                     self?.tableView.reloadData()
-                    self?.deviceModel = DeviceManager().showUsingDevice()
+                    self?.deviceModel = deviceManager.showUsingDevice()
                 }
             }
-        } else {
-            print("Файл в документах новый - скачивать не нужно")
-            tableData = DeviceManager().showDevicesInfo(isDevicesFileToParse: false)
-            tableView.reloadData()
-            deviceModel = DeviceManager().showUsingDevice()
         }
     }
 }

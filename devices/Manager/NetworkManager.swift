@@ -12,26 +12,28 @@ final class NetworkManager {
     // MARK: - Properties
 
     private let fileURL: URL? = {
-        guard let url = URL(string: """
-            https://gist.githubusercontent.com/
-            adamawolf/3048717/
-            raw/07ad6645b25205ef2072a560e660c636c8330626/Apple_mobile_device_types.txt
-        """) else {
+        let urlString = "https://gist.githubusercontent.com/" + "adamawolf/3048717/raw/"
+        + "07ad6645b25205ef2072a560e660c636c8330626/Apple_mobile_device_types.txt"
+        guard let url = URL(string: urlString.trimmingCharacters(in: .whitespacesAndNewlines)) else {
             return nil
         }
         return url
     }()
 
-
     // MARK: - Function
 
     public func downloadFile(completion: @escaping (Result<Void, Error>) -> Void) {
-        let task = URLSession.shared.downloadTask(with: (fileURL ?? URL(string: "https://example.com/default")!)) { file, _, error in
+        guard let fileURL = fileURL else {
+            completion(.failure(DownloadError.invalidURL))
+            return
+        }
+
+        let task = URLSession.shared.downloadTask(with: fileURL) { file, _, error in
             if let file = file, error == nil {
                 guard let destinationURL = FileManager.default
                     .urls(for: .documentDirectory, in: .userDomainMask)
                     .first?
-                    .appendingPathComponent(self.fileURL?.lastPathComponent ?? "") else {
+                    .appendingPathComponent(fileURL.lastPathComponent) else {
                         completion(.failure(DownloadError.invalidDestinationURL))
                         return
                 }
