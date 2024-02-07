@@ -9,41 +9,18 @@ import UIKit
 
 final class NetworkManager {
 
-    // MARK: - Properties
-
-    private let fileURL: URL? = {
-        let urlString = "https://gist.githubusercontent.com/" + "adamawolf/3048717/raw/"
-        + "07ad6645b25205ef2072a560e660c636c8330626/Apple_mobile_device_types.txt"
-        guard let url = URL(string: urlString.trimmingCharacters(in: .whitespacesAndNewlines)) else {
-            return nil
-        }
-        return url
-    }()
-
     // MARK: - Function
 
-    public func downloadFile(completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let fileURL = fileURL else {
-            completion(.failure(DownloadError.invalidURL))
-            return
-        }
-
-        let task = URLSession.shared.downloadTask(with: fileURL) { file, _, error in
+    public func downloadFile(url: URL, fileURL: URL, completion: @escaping (Result<Void, Error>) -> Void) {
+        let task = URLSession.shared.downloadTask(with: url) { file, _, error in
             if let file = file, error == nil {
-                guard let destinationURL = FileManager.default
-                    .urls(for: .documentDirectory, in: .userDomainMask)
-                    .first?
-                    .appendingPathComponent(fileURL.lastPathComponent) else {
-                        completion(.failure(DownloadError.invalidDestinationURL))
-                        return
-                }
                 do {
-                    if FileManager.default.fileExists(atPath: destinationURL.path) {
-                        try FileManager.default.removeItem(at: destinationURL)
-                        print("Старый файл в документах удален: \(destinationURL)")
+                    if FileManager.default.fileExists(atPath: fileURL.path) {
+                        try FileManager.default.removeItem(at: fileURL)
+                        print("Старый файл в документах удален: \(fileURL)")
                     }
-                    try FileManager.default.moveItem(at: file, to: destinationURL)
-                    print("Новый файл добавлен в документы: \(destinationURL)")
+                    try FileManager.default.moveItem(at: file, to: fileURL)
+                    print("Новый файл добавлен в документы: \(fileURL)")
                     completion(.success(()))
                 } catch {
                     print("Ошибка обработки файла в документах: \(error.localizedDescription)")
