@@ -31,8 +31,12 @@ final class ViewController: UIViewController {
         }
         return true
     }
+    private let url = URL(string: "https://gist.githubusercontent.com/adamawolf/3048717/raw/07ad6645b25205ef2072a560e660c636c8330626/Apple_mobile_device_types.txt")!
     private lazy var deviceManager: DeviceManager = {
         return DeviceManager()
+    }()
+    private lazy var networkManager: NetworkManager = {
+        return NetworkManager()
     }()
 
     // MARK: - Lifecycle
@@ -58,11 +62,17 @@ final class ViewController: UIViewController {
     // отображаем данные о девайсах
     private func updateData() {
         let deviceManager = DeviceManager()
+        let networkManager = NetworkManager()
         if deviceManager.existingFileInDocuments() {
             tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: false)
+            guard let fileURL = FileStore.shared.findPathToFileInDocument() else {
+                print("URL не найден")
+                return
+            }
             tableView.reloadData()
             if isBadDocumentFile {
-                NetworkManager().downloadFile { result in
+                networkManager.downloadFile(url: url, fileURL: fileURL) { [weak self] result in
+                    guard let self = self else { return }
                     DispatchQueue.main.async { [weak self] in
                         switch result {
                         case .success:
@@ -82,7 +92,12 @@ final class ViewController: UIViewController {
             }
         } else {
             tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: true)
-            NetworkManager().downloadFile { result in
+            guard let fileURL = FileStore.shared.findPathToFileInDocument() else {
+                print("URL не найден")
+                return
+            }
+            networkManager.downloadFile(url: url, fileURL: fileURL) { [weak self] result in
+                guard let self = self else { return }
                 DispatchQueue.main.async { [weak self] in
                     switch result {
                     case .success:
