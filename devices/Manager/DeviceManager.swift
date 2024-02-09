@@ -11,12 +11,14 @@ final class DeviceManager {
 
     // MARK: - Properties
 
-    private let fileName = "Apple_mobile_device_types.txt"
+    static let fileName = "Apple_mobile_device_types.txt"
+    public var devicesInfo: [String: String] = [:]
 
     // MARK: - Private
 
     private func parsingFile(fileURL: URL, encoding: String.Encoding) {
         if existingFile(fileURL: fileURL) {
+
             do {
                 let fileContent = try String(contentsOf: fileURL, encoding: encoding)
                 let lines = fileContent.components(separatedBy: "\n")
@@ -25,14 +27,14 @@ final class DeviceManager {
                     if components.count == 2 {
                         let key = components[0].trimmingCharacters(in: .whitespaces)
                         let value = components[1].trimmingCharacters(in: .whitespaces)
-                        FileStore.shared.devicesInfo[key] = value
+                        devicesInfo[key] = value
                     }
                 }
             } catch let error {
                 print("Ошибка при чтении файла: \(error.localizedDescription)")
             }
         } else {
-            print("Файл '\(fileName)' не найден в директории Documents.")
+            print("Файл '\(fileURL)' не найден в директории")
         }
     }
 
@@ -40,22 +42,7 @@ final class DeviceManager {
 
     // проверяем есть ли файл
     internal func existingFile(fileURL: URL) -> Bool {
-        if FileManager.default.fileExists(atPath: fileURL.path) {
-            return true
-        }
-        return false
-    }
-
-    // проверяем есть ли файл в документах
-    internal func existingFileInDocuments() -> Bool {
-        if let documentFileURL = FileManager.default
-            .urls(for: .documentDirectory, in: .userDomainMask)
-            .first?
-            .appendingPathComponent(fileName),
-           FileManager.default.fileExists(atPath: documentFileURL.path) {
-            return true
-        }
-        return false
+        FileManager.default.fileExists(atPath: fileURL.path)
     }
 
     // парсим файл в директории Document
@@ -71,14 +58,14 @@ final class DeviceManager {
             if components.count == 2 {
                 let key = components[0].trimmingCharacters(in: .whitespaces)
                 let value = components[1].trimmingCharacters(in: .whitespaces)
-                FileStore.shared.devicesInfo[key] = value
+                devicesInfo[key] = value
             }
         }
     }
 
     // по ключу отдаем значение девайса
     internal func getDeviceDescription(key: String) -> String? {
-        return FileStore.shared.devicesInfo[key]
+        return devicesInfo[key]
     }
 
     // парсим один из файлов
@@ -87,13 +74,14 @@ final class DeviceManager {
         if isDevicesFileToParse {
             parsingFileInDeviceFile(file: devicesFile)
         } else {
-            if let documentFileURL = FileStore.shared.findPathToFileInDocument() {
-                // иначе парсим документ
-                parsingFileInDocument(fileURL: documentFileURL)
+            if let documentFileURL = FileManager().documentsDirectory {
+                // иначе парсим файл в папке документ
+                let fileURL = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentFileURL)
+                parsingFileInDocument(fileURL: fileURL)
             }
         }
         // в любом случае показываем информацию о девайсах
-        return FileStore.shared.devicesInfo
+        return devicesInfo
             .map { DeviceData(key: $0.key, value: $0.value) }
             .sorted { $0.key > $1.key }
     }
