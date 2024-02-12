@@ -19,9 +19,18 @@ final class NetworkManager {
                         try FileManager.default.removeItem(at: fileURL)
                         print("Старый файл в документах удален: \(fileURL)")
                     }
-                    try FileManager.default.moveItem(at: file, to: fileURL)
-                    print("Новый файл добавлен в документы: \(fileURL)")
-                    completion(.success(()))
+                    FileManager.default.moveFile(file: file, to: fileURL) { success, error in
+                        if success {
+                            print("Новый файл добавлен в документы: \(fileURL)")
+                            completion(.success(()))
+                        } else {
+                            print(
+                                "Ошибка обработки файла в документах:" +
+                                "\(error?.localizedDescription ?? "Unknown error")"
+                            )
+                            completion(.failure(error ?? NSError(domain: "UnknownErrorDomain", code: 0, userInfo: nil)))
+                        }
+                    }
                 } catch {
                     print("Ошибка обработки файла в документах: \(error.localizedDescription)")
                     completion(.failure(error))
