@@ -102,7 +102,6 @@ final class DeviceManager {
 
     // по ключу отдаем значение девайса
     internal func getDeviceDescription(key: String) -> String? {
-        print(devicesInfo)
         return devicesInfo[key]
     }
 

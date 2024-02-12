@@ -57,6 +57,7 @@ final class ViewController: UIViewController {
     }
 
     private func getModelOfCurrentDevice() {
+        let deviceManager = DeviceManager(fileExistenceCheck: true)
         print(deviceManager.showUsingDevice())
     }
 }
