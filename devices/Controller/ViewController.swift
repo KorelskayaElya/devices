@@ -23,10 +23,6 @@ final class ViewController: UIViewController {
 
     private var tableData: [DeviceData] = []
     private var deviceModel = ""
-    private let url = URL(string: "https://gist.githubusercontent.com/adamawolf/3048717/raw/07ad6645b25205ef2072a560e660c636c8330626/Apple_mobile_device_types.txt")!
-    private lazy var networkManager: NetworkManager = {
-        return NetworkManager()
-    }()
     private lazy var deviceManager: DeviceManager = {
         return DeviceManager()
     }()
@@ -37,6 +33,7 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         constraints()
         updateData()
+        getModelOfCurrentDevice()
     }
 
     // MARK: - Private
@@ -58,6 +55,10 @@ final class ViewController: UIViewController {
                     .sorted { $0.key > $1.key }
         tableView.reloadData()
     }
+
+    private func getModelOfCurrentDevice() {
+        print(deviceManager.showUsingDevice())
+    }
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
@@ -72,76 +73,3 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
 }
-//        let networkManager = NetworkManager()
-//        let deviceManager = DeviceManager()
-//        let fileManager = FileManager()
-//        let documentDirectory = fileManager.documentsDirectory
-//
-//        guard let documentURL = documentDirectory else {
-//            return
-//        }
-//
-//        let fileURL = fileManager.fileURL(for: DeviceManager.fileName, in: documentURL)
-//        // если файл существует в документах - отображаем девайсы из файла
-//        if fileManager.fileExists(atPath: fileURL.path) {
-//            tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: false)
-//            tableView.reloadData()
-//            // если файл просрочен - скачиваем новый
-//            if isBadDocumentFile {
-//                networkManager.downloadFile(url: url, fileURL: fileURL) { [weak self] result in
-//                    guard let self = self else { return }
-//                    DispatchQueue.main.async { [weak self] in
-//                        switch result {
-//                        case .success:
-//                            print("Файл в документах скачан успешно")
-//                            self?.tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: false)
-//                        case .failure(let error):
-//                            print("Ошибка при скачивании файла: \(error.localizedDescription)")
-//                            print("Используем девайсы из deviceInfo")
-//                        }
-//                        self?.tableView.reloadData()
-//                        self?.deviceModel = deviceManager.showUsingDevice()
-//                    }
-//                }
-//                // файл не просрочен - просто отображаем модель телефона
-//            } else {
-//                tableView.reloadData()
-//                deviceModel = deviceManager.showUsingDevice()
-//            }
-//            // файл не существует в документах - отображаем devicesFile
-//        } else {
-//            tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: true)
-//            // скачиваем файл с сети
-//            networkManager.downloadFile(url: url, fileURL: fileURL) { [weak self] result in
-//                guard let self = self else { return }
-//                DispatchQueue.main.async { [weak self] in
-//                    switch result {
-//                    case .success:
-//                        print("Файл в документах скачан успешно")
-//                        self?.tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: false)
-//                    case .failure(let error):
-//                        print("Ошибка при скачивании файла: \(error.localizedDescription)")
-//                        print("Используем девайсы из devicesFile")
-//                        self?.tableData = deviceManager.showDevicesInfo(isDevicesFileToParse: true)
-//                    }
-//                    self?.tableView.reloadData()
-//                    self?.deviceModel = deviceManager.showUsingDevice()
-//                }
-//            }
-//        }
-//    }
-//    private var isBadDocumentFile: Bool {
-//        // если нет доступа к файлу или файл просрочен - тогда true
-//        guard let documentFileURL = FileManager.default.documentsDirectory else {
-//            return true
-//        }
-//        let file = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentFileURL)
-//        // если дата создания еще сегодня, тогда файл не просрочен
-//        let fileCreationDate = FileManager.default.fileCreationDate(
-//            fileURL: file) ?? Date(timeIntervalSinceReferenceDate: 0)
-//        if Calendar.current.isDateInToday(fileCreationDate) {
-//            return false
-//        } else {
-//            return true
-//        }
-//    }
