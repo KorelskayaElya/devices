@@ -30,7 +30,9 @@ final class ViewController: UIViewController {
         }
         let file = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentFileURL)
         // если дата создания еще сегодня, тогда файл не просрочен
-        if FileManager.default.fileCreationDate(fileURL: file) != nil {
+        let fileCreationDate = FileManager.default.fileCreationDate(
+            fileURL: file) ?? Date(timeIntervalSinceReferenceDate: 0)
+        if Calendar.current.isDateInToday(fileCreationDate) {
             return false
         } else {
             return true
@@ -50,8 +52,6 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         constraints()
         updateData()
-        // тест работает
-        // FileManager.default.testFileManager()
     }
 
     // MARK: - Private

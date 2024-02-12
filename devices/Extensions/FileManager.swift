@@ -27,21 +27,12 @@ extension FileManager {
         return directory.appendingPathComponent(fileName)
     }
 
-    // проверяем просрочен ли файл (24 часа)
+    // возвращаем дату создания файла
     public func fileCreationDate(fileURL: URL) -> Date? {
-        let secondsInDay: TimeInterval = 24 * 60 * 60
-
         do {
             let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
             if let creationDate = attributes[.creationDate] as? Date {
-                let currentTime = Date()
-                let timeDifference = currentTime.timeIntervalSince(creationDate)
-                print(timeDifference, "time_difference")
-                if abs(timeDifference) <= secondsInDay {
-                    return creationDate
-                } else {
-                    return nil
-                }
+                return creationDate
             }
         } catch {
             print("fileCreationDate: Ошибка при получении атрибутов: \(error.localizedDescription)")
@@ -63,35 +54,6 @@ extension FileManager {
         } catch {
             print("Ошибка при перемещении файла: \(error.localizedDescription)")
             completion(false, error)
-        }
-    }
-
-    // тест методов
-    public func testFileManager() {
-        guard let documentsDirectory = FileManager.default.documentsDirectory else { return }
-        print("document directory - \(FileManager.default.documentsDirectory!.path)")
-        let fileInDocumentDirectoryURL = FileManager.default.fileURL(for: "test.txt", in: documentsDirectory)
-        print("text.txt in document directory - \(fileInDocumentDirectoryURL)")
-        let fileInTemporaryDirectoryURL = FileManager.default.fileURL(
-            for: "test.txt", in: FileManager.default.temporaryDirectory)
-
-        do {
-            let fileData = "123456".data(using: .utf8)
-            try fileData?.write(to: fileInTemporaryDirectoryURL)
-        } catch {
-            print("can't save test.txt in temporary directory - \(error.localizedDescription)")
-        }
-        guard let fileInTemporaryDirectoryCreationDate = FileManager.default.fileCreationDate(
-            fileURL: fileInTemporaryDirectoryURL) else {
-            return
-        }
-        print("creation date test.txt in temporary directory - \(fileInTemporaryDirectoryCreationDate)")
-        FileManager.default.moveFile(
-            file: fileInTemporaryDirectoryURL,
-            to: documentsDirectory) { success, _  in
-            if success {
-                print("creation date test.txt in document directory - \(fileInTemporaryDirectoryCreationDate)")
-            }
         }
     }
 }
