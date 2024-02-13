@@ -92,10 +92,10 @@
 		6D6406BC2B64077D0086E3F7 /* devices */ = {
 			isa = PBXGroup;
 			children = (
-				6D6C128F2B753F5800E52EF8 /* Extensions */,
+				6D6406D52B652D2D0086E3F7 /* Controller */,
 				6D2F31732B67C23A00A39C70 /* Model */,
 				6D6406D62B652D410086E3F7 /* Manager */,
-				6D6406D52B652D2D0086E3F7 /* Controller */,
+				6D6C128F2B753F5800E52EF8 /* Extensions */,
 				6D6406BD2B64077D0086E3F7 /* AppDelegate.swift */,
 				6D6406BF2B64077D0086E3F7 /* SceneDelegate.swift */,
 				6D6406CB2B64077F0086E3F7 /* Info.plist */,
@@ -115,8 +115,8 @@
 		6D6406D62B652D410086E3F7 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
-				6D6406D12B651D830086E3F7 /* NetworkManager.swift */,
 				6D2F317B2B6D147400A39C70 /* DeviceManager.swift */,
+				6D6406D12B651D830086E3F7 /* NetworkManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -153,11 +153,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6D6406CE2B64077F0086E3F7 /* Build configuration list for PBXNativeTarget "devices" */;
 			buildPhases = (
-				6D2F31722B67C07300A39C70 /* ShellScript */,
 				2513F7FA3A96D3C9938BBA96 /* [CP] Check Pods Manifest.lock */,
+				6D2F31722B67C07300A39C70 /* ShellScript */,
 				6D6406B62B64077D0086E3F7 /* Sources */,
 				6D6406B72B64077D0086E3F7 /* Frameworks */,
 				6D6406B82B64077D0086E3F7 /* Resources */,
+				DF5FDDC52B7B83DF00678CF2 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -253,6 +254,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
+		};
+		DF5FDDC52B7B83DF00678CF2 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nTAGS=\"TODO:|FIXME:\"\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($TAGS).*\\$\" | perl -p -e \"s/($TAGS)/ warning: \\$1/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -414,7 +432,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 92RNZ7CX2N;
+				DEVELOPMENT_TEAM = TL53AC244V;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = devices/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -442,7 +460,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 92RNZ7CX2N;
+				DEVELOPMENT_TEAM = TL53AC244V;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = devices/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

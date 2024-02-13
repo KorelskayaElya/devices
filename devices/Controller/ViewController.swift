@@ -23,16 +23,18 @@ final class ViewController: UIViewController {
 
     private var tableData: [DeviceData] = []
     private var deviceModel = ""
-    private lazy var deviceManager: DeviceManager = {
-        return DeviceManager()
-    }()
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         constraints()
+        // TODO: Убрать потом принудительное удаление файла
+        let documentDirectory = FileManager.default.documentsDirectory!
+        let fileUrl = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentDirectory)
+        FileManager.default.removeFile(file: fileUrl)
         updateData()
+        updateDataFromServer()
         getModelOfCurrentDevice()
     }
 
@@ -50,15 +52,24 @@ final class ViewController: UIViewController {
 
     // отображаем данные о девайсах
     private func updateData() {
-        let deviceManager = DeviceManager(fileExistenceCheck: true)
-        tableData = deviceManager.devicesInfo.map { DeviceData(key: $0.key, value: $0.value) }
+        let devicesInfo = DeviceManager.sharedInstance.devicesInfo
+        tableData = devicesInfo.map { DeviceData(key: $0.key, value: $0.value) }
                     .sorted { $0.key > $1.key }
         tableView.reloadData()
     }
 
+    private func updateDataFromServer() {
+        DispatchQueue.global(qos: .default).async { [weak self] in
+            DeviceManager.sharedInstance.loadModelsFromServerIfNeeded {
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                    self?.updateData()
+                }
+            }
+        }
+    }
+
     private func getModelOfCurrentDevice() {
-        let deviceManager = DeviceManager(fileExistenceCheck: true)
-        print(deviceManager.showUsingDevice())
+        print(DeviceManager.sharedInstance.showUsingDevice())
     }
 }
 

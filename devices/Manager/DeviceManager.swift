@@ -11,12 +11,49 @@ final class DeviceManager {
 
     // MARK: - Properties
 
+    static let sharedInstance = DeviceManager()
+
     static let fileName = "Apple_mobile_device_types.txt"
     public var devicesInfo: [String: String] = [:]
     private var isTodayString = ""
     private let url = URL(string: "https://gist.githubusercontent.com/adamawolf/3048717/raw/07ad6645b25205ef2072a560e660c636c8330626/Apple_mobile_device_types.txt")!
 
     // MARK: - Init
+
+    init() {
+        loadModelsFromCache()
+    }
+
+    private func loadModelsFromCache() {
+        var modelsString = devicesFile
+        if let documentsDirectory = FileManager.default.documentsDirectory {
+            let fileURL = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentsDirectory)
+            if let fileData = FileManager.default.contents(atPath: fileURL.path) {
+                modelsString = String(decoding: fileData, as: UTF8.self)
+            }
+            devicesInfo = parseDeviceFile(content: modelsString)
+        }
+    }
+
+    func loadModelsFromServerIfNeeded(completion: @escaping () -> Void) {
+        var needToLoadModels = true
+        if let documentsDirectory = FileManager.default.documentsDirectory {
+            let fileURL = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentsDirectory)
+            if FileManager.default.fileExists(atPath: fileURL.path),
+               let fileCreationDate = FileManager.default.fileCreationDate(fileURL: fileURL),
+               Calendar.current.isDateInToday(fileCreationDate) {
+                needToLoadModels = false
+            }
+            if needToLoadModels {
+                downloadNewFile(url: url, fileURL: fileURL) { [weak self] newDevicesInfo in
+                    self?.devicesInfo = newDevicesInfo ?? [:]
+                    completion()
+                }
+            } else {
+                completion()
+            }
+        } else { completion() }
+    }
 
     convenience init(fileExistenceCheck: Bool = true) {
         self.init()
@@ -43,6 +80,7 @@ final class DeviceManager {
                     guard let newDeviceData = newDeviceData else { return }
                     self?.devicesInfo = newDeviceData
                 }
+                // TO-DO:
             }
         }
     }
@@ -65,6 +103,7 @@ final class DeviceManager {
 
     // MARK: - Internal
 
+    // FIXME: Зачем делать отдельную функцию
     // проверяем есть ли файл
     internal func existingFile(fileURL: URL) -> Bool {
         FileManager.default.fileExists(atPath: fileURL.path)
@@ -84,18 +123,14 @@ final class DeviceManager {
 
     internal func downloadNewFile(url: URL, fileURL: URL, completion: @escaping ([String: String]?) -> Void) {
         NetworkManager().downloadFile(url: url, fileURL: fileURL) { [weak self] result in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    print("Файл в документах скачан успешно")
-                    let deviceData = self.parsingFileInDocument(fileURL: fileURL)
-                    self.devicesInfo = deviceData
-                    completion(deviceData)
-                case .failure(let error):
-                    print("Ошибка при скачивании файла: \(error.localizedDescription)")
-                    completion(nil)
-                }
+            switch result {
+            case .success:
+                print("Файл в документах скачан успешно")
+                let devicesInfo = self?.parsingFileInDocument(fileURL: fileURL)
+                completion(devicesInfo)
+            case .failure(let error):
+                print("Ошибка при скачивании файла: \(error.localizedDescription)")
+                completion(nil)
             }
         }
     }

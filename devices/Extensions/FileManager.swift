@@ -56,4 +56,15 @@ extension FileManager {
             completion(false, error)
         }
     }
+
+    // перемещаем файл в директорию
+    public func removeFile(file: URL) {
+        let fileManager = FileManager.default
+        do {
+            if fileManager.fileExists(atPath: file.path) {
+                try fileManager.removeItem(at: file)
+            }
+        } catch {
+        }
+    }
 }
