@@ -29,13 +29,8 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         constraints()
-        // TODO: Убрать потом принудительное удаление файла
-        let documentDirectory = FileManager.default.documentsDirectory!
-        let fileUrl = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentDirectory)
-        FileManager.default.removeFile(file: fileUrl)
         updateData()
         updateDataFromServer()
-        getModelOfCurrentDevice()
     }
 
     // MARK: - Private
@@ -58,16 +53,19 @@ final class ViewController: UIViewController {
         tableView.reloadData()
     }
 
+    // обновляем данные, полученнные из сети
     private func updateDataFromServer() {
         DispatchQueue.global(qos: .default).async { [weak self] in
             DeviceManager.sharedInstance.loadModelsFromServerIfNeeded {
-                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                DispatchQueue.main.async {
                     self?.updateData()
+                    self?.getModelOfCurrentDevice()
                 }
             }
         }
     }
 
+    // возвращаем модель текущего девайса
     private func getModelOfCurrentDevice() {
         print(DeviceManager.sharedInstance.showUsingDevice())
     }

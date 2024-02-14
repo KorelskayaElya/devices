@@ -12,7 +12,6 @@ final class DeviceManager {
     // MARK: - Properties
 
     static let sharedInstance = DeviceManager()
-
     static let fileName = "Apple_mobile_device_types.txt"
     public var devicesInfo: [String: String] = [:]
     private var isTodayString = ""
@@ -24,6 +23,9 @@ final class DeviceManager {
         loadModelsFromCache()
     }
 
+    // MARK: - Private
+
+    // проверка наличия файла в директории Document
     private func loadModelsFromCache() {
         var modelsString = devicesFile
         if let documentsDirectory = FileManager.default.documentsDirectory {
@@ -35,7 +37,23 @@ final class DeviceManager {
         }
     }
 
-    func loadModelsFromServerIfNeeded(completion: @escaping () -> Void) {
+    // парсинг
+    private func parseDeviceFile(content: String) -> [String: String] {
+        let lines = content.components(separatedBy: "\n")
+        for line in lines {
+            let components = line.components(separatedBy: ":")
+            if components.count == 2 {
+                let key = components[0].trimmingCharacters(in: .whitespaces)
+                let value = components[1].trimmingCharacters(in: .whitespaces)
+                devicesInfo[key] = value
+            }
+        }
+        return devicesInfo
+    }
+
+    // MARK: - Internal
+
+    internal func loadModelsFromServerIfNeeded(completion: @escaping () -> Void) {
         var needToLoadModels = true
         if let documentsDirectory = FileManager.default.documentsDirectory {
             let fileURL = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentsDirectory)
@@ -55,60 +73,6 @@ final class DeviceManager {
         } else { completion() }
     }
 
-    convenience init(fileExistenceCheck: Bool = true) {
-        self.init()
-        if fileExistenceCheck, let documentFileURL = FileManager().documentsDirectory {
-            let fileURL = FileManager.default.fileURL(for: DeviceManager.fileName, in: documentFileURL)
-            if existingFile(fileURL: fileURL) {
-                let deviceData = parsingFileInDocument(fileURL: fileURL)
-                devicesInfo = deviceData
-                // проверка на актуальность файла
-                let fileCreationDate = FileManager.default.fileCreationDate(
-                    fileURL: fileURL) ?? Date(timeIntervalSinceReferenceDate: 0)
-                isTodayString = Calendar.current.isDateInToday(fileCreationDate) ? "is Today" : "is not Today"
-                if isTodayString == "is not Today" {
-                    downloadNewFile(url: url, fileURL: fileURL) { [weak self] newDeviceData in
-                        guard let newDeviceData = newDeviceData else { return }
-                        self?.devicesInfo = newDeviceData
-                    }
-                }
-            } else {
-                print("Файл '\(DeviceManager.fileName)' не найден в директории документов")
-                let deviceData = parseDeviceFile(content: devicesFile)
-                devicesInfo = deviceData
-                downloadNewFile(url: url, fileURL: fileURL) { [weak self] newDeviceData in
-                    guard let newDeviceData = newDeviceData else { return }
-                    self?.devicesInfo = newDeviceData
-                }
-                // TO-DO:
-            }
-        }
-    }
-
-    // MARK: - Private
-
-    // парсинг
-    private func parseDeviceFile(content: String) -> [String: String] {
-        let lines = content.components(separatedBy: "\n")
-        for line in lines {
-            let components = line.components(separatedBy: ":")
-            if components.count == 2 {
-                let key = components[0].trimmingCharacters(in: .whitespaces)
-                let value = components[1].trimmingCharacters(in: .whitespaces)
-                devicesInfo[key] = value
-            }
-        }
-        return devicesInfo
-    }
-
-    // MARK: - Internal
-
-    // FIXME: Зачем делать отдельную функцию
-    // проверяем есть ли файл
-    internal func existingFile(fileURL: URL) -> Bool {
-        FileManager.default.fileExists(atPath: fileURL.path)
-    }
-
     // парсим файл в директории Document
     internal func parsingFileInDocument(fileURL: URL) -> [String: String] {
         do {
@@ -121,6 +85,7 @@ final class DeviceManager {
         return [:]
     }
 
+    // загружаем файл из сети
     internal func downloadNewFile(url: URL, fileURL: URL, completion: @escaping ([String: String]?) -> Void) {
         NetworkManager().downloadFile(url: url, fileURL: fileURL) { [weak self] result in
             switch result {
